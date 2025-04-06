@@ -1,0 +1,1 @@
+ build/web/manifest.json:  /home/john/Documenti/RepFilesManagementApp/web/index.html /home/john/Documenti/RepFilesManagementApp/web/manifest.json
