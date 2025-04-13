@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:repfiles/models/app_state.dart';
 import 'package:repfiles/models/reptile.dart';
+import '../styles/app_theme.dart';
+import '../models/morph.dart';
 
 class AnimalsScreen extends StatelessWidget {
   const AnimalsScreen({super.key});
@@ -107,74 +109,294 @@ class AddReptileDialog extends StatefulWidget {
 class _AddReptileDialogState extends State<AddReptileDialog> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _speciesController = TextEditingController();
-  DateTime _dateOfBirth = DateTime.now();
+  final _identifierController = TextEditingController();
+  final _breederController = TextEditingController();
+  final _remarksController = TextEditingController();
+  final _lengthController = TextEditingController();
+  final _weightController = TextEditingController();
+  
   String _sex = 'Unknown';
+  String _group = 'No group selected';
+  String _lengthUnit = 'cm';
+  String _weightUnit = 'gr';
+  DateTime? _birthdate;
+  List<String> _selectedMorphs = [];
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('Add New Reptile'),
-      content: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
+      content: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Name'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a name';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _speciesController,
-                decoration: const InputDecoration(labelText: 'Species'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a species';
-                  }
-                  return null;
-                },
+              const Text(
+                'Enter a name or an identifier, or both if you want to',
+                style: TextStyle(color: Colors.grey),
               ),
               const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: _sex,
-                decoration: const InputDecoration(labelText: 'Sex'),
-                items: ['Unknown', 'Male', 'Female']
-                    .map((sex) => DropdownMenuItem(
-                          value: sex,
-                          child: Text(sex),
-                        ))
-                    .toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _sex = value);
-                  }
-                },
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _nameController,
+                      decoration: const InputDecoration(
+                        labelText: 'Name',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _identifierController,
+                      decoration: const InputDecoration(
+                        labelText: 'Identifier',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
-              ListTile(
-                title: const Text('Date of Birth'),
-                subtitle: Text(
-                  '${_dateOfBirth.day}/${_dateOfBirth.month}/${_dateOfBirth.year}',
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Group'),
+                        const SizedBox(height: 8),
+                        InputDecorator(
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(_group),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.add),
+                                onPressed: () {
+                                  // TODO: Implement group selection
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Sex'),
+                        const SizedBox(height: 8),
+                        SegmentedButton<String>(
+                          segments: const [
+                            ButtonSegment(
+                              value: 'Female',
+                              icon: Icon(Icons.female),
+                            ),
+                            ButtonSegment(
+                              value: 'Male',
+                              icon: Icon(Icons.male),
+                            ),
+                            ButtonSegment(
+                              value: 'Unknown',
+                              icon: Icon(Icons.question_mark),
+                            ),
+                          ],
+                          selected: {_sex},
+                          onSelectionChanged: (Set<String> newSelection) {
+                            setState(() {
+                              _sex = newSelection.first;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Morphs'),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.add),
+                        label: const Text('Select Morphs'),
+                        onPressed: _showMorphSelectionDialog,
+                      ),
+                    ],
+                  ),
+                  if (_selectedMorphs.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: _selectedMorphs.map((morph) {
+                        return Chip(
+                          label: Text(morph),
+                          onDeleted: () {
+                            setState(() {
+                              _selectedMorphs.remove(morph);
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Length'),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: _lengthController,
+                                decoration: const InputDecoration(
+                                  hintText: '0',
+                                  border: OutlineInputBorder(),
+                                ),
+                                keyboardType: TextInputType.number,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            DropdownButton<String>(
+                              value: _lengthUnit,
+                              items: ['cm', 'mm', 'inch', 'ft']
+                                  .map((unit) => DropdownMenuItem(
+                                        value: unit,
+                                        child: Text(unit),
+                                      ))
+                                  .toList(),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  setState(() => _lengthUnit = value);
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Weight'),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: _weightController,
+                                decoration: const InputDecoration(
+                                  hintText: '0',
+                                  border: OutlineInputBorder(),
+                                ),
+                                keyboardType: TextInputType.number,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            DropdownButton<String>(
+                              value: _weightUnit,
+                              items: ['gr', 'kg', 'oz', 'lbs']
+                                  .map((unit) => DropdownMenuItem(
+                                        value: unit,
+                                        child: Text(unit),
+                                      ))
+                                  .toList(),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  setState(() => _weightUnit = value);
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Birthdate'),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          decoration: InputDecoration(
+                            border: const OutlineInputBorder(),
+                            suffixIcon: IconButton(
+                              icon: const Icon(Icons.calendar_today),
+                              onPressed: () async {
+                                final date = await showDatePicker(
+                                  context: context,
+                                  initialDate: _birthdate ?? DateTime.now(),
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime.now(),
+                                );
+                                if (date != null) {
+                                  setState(() => _birthdate = date);
+                                }
+                              },
+                            ),
+                          ),
+                          controller: TextEditingController(
+                            text: _birthdate != null
+                                ? '${_birthdate!.day}-${_birthdate!.month}-${_birthdate!.year}'
+                                : '',
+                          ),
+                          readOnly: true,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _breederController,
+                      decoration: const InputDecoration(
+                        labelText: 'Breeder',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _remarksController,
+                decoration: const InputDecoration(
+                  labelText: 'Remarks',
+                  border: OutlineInputBorder(),
+                  hintText: 'add your remarks here...',
                 ),
-                trailing: const Icon(Icons.calendar_today),
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: _dateOfBirth,
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime.now(),
-                  );
-                  if (date != null) {
-                    setState(() => _dateOfBirth = date);
-                  }
-                },
+                maxLines: 5,
               ),
             ],
           ),
@@ -186,32 +408,110 @@ class _AddReptileDialogState extends State<AddReptileDialog> {
           child: const Text('Cancel'),
         ),
         ElevatedButton(
-          onPressed: _submitForm,
-          child: const Text('Add'),
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              // TODO: Save reptile data
+              Navigator.pop(context);
+            }
+          },
+          child: const Text('Save'),
         ),
       ],
     );
   }
 
-  void _submitForm() {
-    if (_formKey.currentState?.validate() ?? false) {
-      final reptile = Reptile(
-        id: DateTime.now().toString(), // TODO: Replace with proper ID generation
-        name: _nameController.text,
-        species: _speciesController.text,
-        dateOfBirth: _dateOfBirth,
-        sex: _sex,
-      );
+  Future<void> _showMorphSelectionDialog() async {
+    final List<Morph> availableMorphs = [
+      const Morph(
+        name: 'Normal',
+        traits: ['Wild Type'],
+      ),
+      const Morph(
+        name: 'Albino',
+        description: 'Lacks melanin pigment',
+        traits: ['Recessive'],
+      ),
+      const Morph(
+        name: 'Piebald',
+        description: 'White patches on body',
+        traits: ['Recessive'],
+      ),
+      const Morph(
+        name: 'Spider',
+        description: 'Reduced pattern with web-like markings',
+        traits: ['Dominant'],
+      ),
+      // Add more morphs as needed
+    ];
 
-      context.read<AppState>().addReptile(reptile);
-      Navigator.pop(context);
+    final List<String>? result = await showDialog<List<String>>(
+      context: context,
+      builder: (BuildContext context) {
+        List<String> tempSelection = List.from(_selectedMorphs);
+        
+        return AlertDialog(
+          title: const Text('Select Morphs'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: StatefulBuilder(
+              builder: (context, setState) {
+                return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: availableMorphs.length,
+                  itemBuilder: (context, index) {
+                    final morph = availableMorphs[index];
+                    return CheckboxListTile(
+                      title: Text(morph.name),
+                      subtitle: morph.description != null
+                          ? Text(
+                              '${morph.description}\nTraits: ${morph.traits.join(", ")}',
+                            )
+                          : Text('Traits: ${morph.traits.join(", ")}'),
+                      value: tempSelection.contains(morph.name),
+                      onChanged: (bool? value) {
+                        setState(() {
+                          if (value == true) {
+                            tempSelection.add(morph.name);
+                          } else {
+                            tempSelection.remove(morph.name);
+                          }
+                        });
+                      },
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, tempSelection),
+              child: const Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedMorphs = result;
+      });
     }
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _speciesController.dispose();
+    _identifierController.dispose();
+    _breederController.dispose();
+    _remarksController.dispose();
+    _lengthController.dispose();
+    _weightController.dispose();
     super.dispose();
   }
 } 

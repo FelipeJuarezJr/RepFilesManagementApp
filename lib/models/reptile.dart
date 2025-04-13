@@ -1,39 +1,63 @@
 class Reptile {
-  final String id;
   final String name;
-  final String species;
-  final DateTime dateOfBirth;
+  final String? identifier;
+  final String? group;
   final String sex;
-  final double weight;
-  final String notes;
+  final String? morph;
+  final double? length;
+  final String lengthUnit;
+  final double? weight;
+  final String weightUnit;
+  final DateTime dateOfBirth;
+  final String? breeder;
+  final String? remarks;
+  final String species;
 
   Reptile({
-    required this.id,
     required this.name,
-    required this.species,
+    this.identifier,
+    this.group,
+    this.sex = 'Unknown',
+    this.morph,
+    this.length,
+    this.lengthUnit = 'cm',
+    this.weight,
+    this.weightUnit = 'gr',
     required this.dateOfBirth,
-    required this.sex,
-    this.weight = 0.0,
-    this.notes = '',
+    this.breeder,
+    this.remarks,
+    required this.species,
   });
 
   Map<String, dynamic> toJson() => {
-    'id': id,
     'name': name,
-    'species': species,
-    'dateOfBirth': dateOfBirth.toIso8601String(),
+    'identifier': identifier,
+    'group': group,
     'sex': sex,
+    'morph': morph,
+    'length': length,
+    'lengthUnit': lengthUnit,
     'weight': weight,
-    'notes': notes,
+    'weightUnit': weightUnit,
+    'dateOfBirth': dateOfBirth.toIso8601String(),
+    'breeder': breeder,
+    'remarks': remarks,
+    'species': species,
   };
 
   factory Reptile.fromJson(Map<String, dynamic> json) => Reptile(
-    id: json['id'],
     name: json['name'],
-    species: json['species'],
-    dateOfBirth: DateTime.parse(json['dateOfBirth']),
+    identifier: json['identifier'],
+    group: json['group'],
     sex: json['sex'],
-    weight: json['weight']?.toDouble() ?? 0.0,
-    notes: json['notes'] ?? '',
+    morph: json['morph'],
+    length: json['length']?.toDouble(),
+    lengthUnit: json['lengthUnit'] ?? 'cm',
+    weight: json['weight']?.toDouble(),
+    weightUnit: json['weightUnit'] ?? 'gr',
+    dateOfBirth: DateTime.parse(json['dateOfBirth']),
+    breeder: json['breeder'],
+    remarks: json['remarks'],
+    species: json['species'],
   );
 } 
