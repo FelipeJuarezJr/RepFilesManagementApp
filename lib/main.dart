@@ -1,35 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:repfiles/models/app_state.dart';
-import 'package:repfiles/routes.dart';
-import 'package:repfiles/screens/home_screen.dart';
+import 'screens/login_screen.dart';
 
 void main() {
-  print('Starting RepFiles App');
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => AppState(),
-      child: const RepFilesApp(),
-    ),
-  );
+  runApp(const MyApp());
 }
 
-class RepFilesApp extends StatelessWidget {
-  const RepFilesApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'RepFiles',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: const Color(0xFF348944), // Green color from original app
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF348944),
-        ),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      initialRoute: '/',
-      routes: AppRoutes.routes,
+      home: const LoginScreen(),
     );
   }
 } 
