@@ -76,57 +76,91 @@ class _ReptileDetailsScreenState extends State<ReptileDetailsScreen> {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Row(
+        child: Column(
           children: [
-            // Hero Image
-            Image.asset(
-              'assets/images/gecko.svg',
-              height: 120,
-              width: 120,
-            ),
-            const SizedBox(width: 16),
-            
-            // Details
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        '${reptile.name} (${reptile.identifier})',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      _buildGenderIcon(),
-                    ],
-                  ),
-                  Text(
-                    reptile.species,
-                    style: const TextStyle(
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Hero Image with placeholder
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.pets,
+                      size: 60,
                       color: Colors.grey,
                     ),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 16),
+                
+                // Details
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '${reptile.name} (${reptile.identifier})',
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          _buildGenderIcon(),
+                        ],
+                      ),
+                      Text(
+                        reptile.species,
+                        style: const TextStyle(
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-
-            // Stats
-            _buildStat('Age', '1 day'),
-            _buildStat('Weight', '${reptile.weight} ${reptile.weightUnit}'),
-            _buildStat('Length', '${reptile.length} ${reptile.lengthUnit}'),
+            const SizedBox(height: 16),
+            
+            // Stats in a separate row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildStat('Age', '1 day'),
+                _buildStatDivider(),
+                _buildStat('Weight', '${reptile.weight} ${reptile.weightUnit}'),
+                _buildStatDivider(),
+                _buildStat('Length', '${reptile.length} ${reptile.lengthUnit}'),
+              ],
+            ),
           ],
         ),
       ),
     );
   }
 
+  Widget _buildStatDivider() {
+    return Container(
+      height: 40,
+      width: 1,
+      color: Colors.grey[300],
+    );
+  }
+
   Widget _buildStat(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+    return Expanded(
       child: Column(
         children: [
           Text(
