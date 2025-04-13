@@ -4,6 +4,7 @@ import 'package:repfiles/models/app_state.dart';
 import 'package:repfiles/models/reptile.dart';
 import '../styles/app_theme.dart';
 import '../models/morph.dart';
+import '../widgets/add_tracking_dialog.dart';
 
 class AnimalsScreen extends StatelessWidget {
   const AnimalsScreen({super.key});
@@ -176,18 +177,22 @@ class ReptileCard extends StatelessWidget {
                 _buildActionButton(
                   icon: Icons.timer,
                   tooltip: 'Add tracking',
+                  context: context,
                 ),
                 _buildActionButton(
                   icon: Icons.note_add,
                   tooltip: 'Add note',
+                  context: context,
                 ),
                 _buildActionButton(
                   icon: Icons.straighten,
                   tooltip: 'Add measurement',
+                  context: context,
                 ),
                 _buildActionButton(
                   icon: Icons.restaurant,
                   tooltip: 'Feeding',
+                  context: context,
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
@@ -244,12 +249,20 @@ class ReptileCard extends StatelessWidget {
   Widget _buildActionButton({
     required IconData icon,
     required String tooltip,
+    required BuildContext context,
   }) {
     return IconButton(
       icon: Icon(icon, size: 20),
       tooltip: tooltip,
       onPressed: () {
-        // TODO: Implement actions
+        if (tooltip == 'Add tracking') {
+          showDialog(
+            context: context,
+            builder: (context) => AddTrackingDialog(
+              reptileName: reptile.name,
+            ),
+          );
+        }
       },
     );
   }

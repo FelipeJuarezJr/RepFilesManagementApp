@@ -1,11 +1,13 @@
 import 'package:flutter/foundation.dart';
-import 'package:repfiles/models/reptile.dart';
+import 'reptile.dart';
+import 'tracking_entry.dart';
 
 class AppState extends ChangeNotifier {
   int _totalAnimals = 0;
   int _activeBreedingProjects = 0;
   int _todaysTasks = 0;
-  List<Reptile> _reptiles = [];
+  final List<Reptile> _reptiles = [];
+  final List<TrackingEntry> _trackingEntries = [];
   bool _isLoading = false;
   String? _error;
 
@@ -17,6 +19,7 @@ class AppState extends ChangeNotifier {
   int get activeBreedingProjects => _activeBreedingProjects;
   int get todaysTasks => _todaysTasks;
   List<Reptile> get reptiles => List.unmodifiable(_reptiles);
+  List<TrackingEntry> get trackingEntries => List.unmodifiable(_trackingEntries);
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -43,7 +46,7 @@ class AppState extends ChangeNotifier {
     try {
       // TODO: Implement API call to load reptiles
       await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
-      _reptiles = []; // Replace with actual data
+      _reptiles.clear(); // Replace with actual data
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -58,7 +61,6 @@ class AppState extends ChangeNotifier {
       _error = null;
       notifyListeners();
 
-      // TODO: Add API call or database operation here
       await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
       
       _reptiles.add(reptile);
@@ -86,6 +88,21 @@ class AppState extends ChangeNotifier {
   // Remove a reptile
   void removeReptile(Reptile reptile) {
     _reptiles.remove(reptile);
+    // Also remove associated tracking entries
+    _trackingEntries.removeWhere((entry) => entry.reptileName == reptile.name);
     notifyListeners();
+  }
+
+  // Add tracking entry
+  void addTrackingEntry(TrackingEntry entry) {
+    _trackingEntries.add(entry);
+    notifyListeners();
+  }
+
+  // Get tracking entries for a specific reptile
+  List<TrackingEntry> getTrackingEntriesForReptile(String reptileName) {
+    return _trackingEntries
+        .where((entry) => entry.reptileName == reptileName)
+        .toList();
   }
 } 
