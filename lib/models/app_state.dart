@@ -1,13 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:repfiles/models/reptile.dart';
 
-class AppState with ChangeNotifier {
+class AppState extends ChangeNotifier {
   int _totalAnimals = 0;
   int _activeBreedingProjects = 0;
   int _todaysTasks = 0;
   List<Reptile> _reptiles = [];
   bool _isLoading = false;
   String? _error;
+
+  // List to store animals
+  final List<dynamic> _animals = [];
+  List<dynamic> get animals => List.unmodifiable(_animals);
 
   int get totalAnimals => _totalAnimals;
   int get activeBreedingProjects => _activeBreedingProjects;
@@ -62,5 +66,17 @@ class AppState with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  // Method to add an animal
+  void addAnimal(dynamic animal) {
+    _animals.add(animal);
+    notifyListeners();
+  }
+
+  // Method to remove an animal
+  void removeAnimal(dynamic animal) {
+    _animals.remove(animal);
+    notifyListeners();
   }
 } 

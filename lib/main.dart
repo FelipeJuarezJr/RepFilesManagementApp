@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/dashboard_screen.dart';
@@ -8,9 +9,16 @@ import 'screens/calculator_screen.dart';
 import 'screens/schedule_screen.dart';
 import 'screens/food_supply_screen.dart';
 import 'screens/settings_screen.dart';
+import 'styles/app_theme.dart';
+import 'models/app_state.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => AppState(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -21,10 +29,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'RepFiles',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.lightTheme,
       initialRoute: '/',
       routes: {
         '/': (context) => const LoginScreen(),
