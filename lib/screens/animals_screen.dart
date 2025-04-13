@@ -7,6 +7,7 @@ import '../models/morph.dart';
 import '../widgets/add_tracking_dialog.dart';
 import '../widgets/add_note_dialog.dart';
 import '../widgets/view_notes_dialog.dart';
+import '../screens/reptile_details_screen.dart';
 
 class AnimalsScreen extends StatelessWidget {
   const AnimalsScreen({super.key});
@@ -199,7 +200,14 @@ class ReptileCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: () {
-                    // TODO: Navigate to details
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ReptileDetailsScreen(
+                          reptile: reptile,
+                        ),
+                      ),
+                    );
                   },
                   child: const Text('Details'),
                 ),
@@ -721,12 +729,13 @@ class _AddReptileDialogState extends State<AddReptileDialog> {
         sex: _sex,
         group: _group == 'No group selected' ? null : _group,
         morph: _selectedMorphs.isNotEmpty ? _selectedMorphs.join(', ') : null,
-        length: double.tryParse(_lengthController.text),
+        length: double.tryParse(_lengthController.text) ?? 0,
         lengthUnit: _lengthUnit,
-        weight: double.tryParse(_weightController.text),
+        weight: double.tryParse(_weightController.text) ?? 0,
         weightUnit: _weightUnit,
         breeder: _breederController.text,
         remarks: _remarksController.text,
+        gender: 'unknown',
       );
 
       try {

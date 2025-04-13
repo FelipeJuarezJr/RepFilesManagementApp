@@ -2,6 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'reptile.dart';
 import 'tracking_entry.dart';
 import 'note_entry.dart';
+import 'feeding_entry.dart';
+import 'history_entry.dart';
+import 'photo_entry.dart';
+import 'file_entry.dart';
 
 class AppState extends ChangeNotifier {
   int _totalAnimals = 0;
@@ -10,6 +14,10 @@ class AppState extends ChangeNotifier {
   final List<Reptile> _reptiles = [];
   final List<TrackingEntry> _trackingEntries = [];
   final List<NoteEntry> _noteEntries = [];
+  final List<FeedingEntry> _feedingEntries = [];
+  final List<HistoryEntry> _historyEntries = [];
+  final List<PhotoEntry> _photoEntries = [];
+  final List<FileEntry> _fileEntries = [];
   bool _isLoading = false;
   String? _error;
 
@@ -23,6 +31,10 @@ class AppState extends ChangeNotifier {
   List<Reptile> get reptiles => List.unmodifiable(_reptiles);
   List<TrackingEntry> get trackingEntries => List.unmodifiable(_trackingEntries);
   List<NoteEntry> get noteEntries => List.unmodifiable(_noteEntries);
+  List<FeedingEntry> get feedingEntries => List.unmodifiable(_feedingEntries);
+  List<HistoryEntry> get historyEntries => List.unmodifiable(_historyEntries);
+  List<PhotoEntry> get photoEntries => List.unmodifiable(_photoEntries);
+  List<FileEntry> get fileEntries => List.unmodifiable(_fileEntries);
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -91,9 +103,12 @@ class AppState extends ChangeNotifier {
   // Remove a reptile
   void removeReptile(Reptile reptile) {
     _reptiles.remove(reptile);
-    // Also remove associated tracking entries
     _trackingEntries.removeWhere((entry) => entry.reptileName == reptile.name);
     _noteEntries.removeWhere((note) => note.reptileName == reptile.name);
+    _feedingEntries.removeWhere((entry) => entry.reptileName == reptile.name);
+    _historyEntries.removeWhere((entry) => entry.reptileName == reptile.name);
+    _photoEntries.removeWhere((entry) => entry.reptileName == reptile.name);
+    _fileEntries.removeWhere((entry) => entry.reptileName == reptile.name);
     notifyListeners();
   }
 
@@ -129,6 +144,79 @@ class AppState extends ChangeNotifier {
 
   void deleteNote(NoteEntry note) {
     _noteEntries.remove(note);
+    notifyListeners();
+  }
+
+  // Feeding methods
+  void addFeeding(FeedingEntry entry) {
+    _feedingEntries.add(entry);
+    notifyListeners();
+  }
+
+  List<FeedingEntry> getFeedingsForReptile(String reptileName) {
+    return _feedingEntries
+        .where((entry) => entry.reptileName == reptileName)
+        .toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
+  }
+
+  // History methods
+  void addHistory(HistoryEntry entry) {
+    _historyEntries.add(entry);
+    notifyListeners();
+  }
+
+  List<HistoryEntry> getHistoryForReptile(String reptileName) {
+    return _historyEntries
+        .where((entry) => entry.reptileName == reptileName)
+        .toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
+  }
+
+  // Photo methods
+  Future<void> addPhoto(PhotoEntry entry) async {
+    _photoEntries.add(entry);
+    notifyListeners();
+  }
+
+  List<PhotoEntry> getPhotosForReptile(String reptileName) {
+    return _photoEntries
+        .where((entry) => entry.reptileName == reptileName)
+        .toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
+  }
+
+  // File methods
+  Future<void> addFile(FileEntry entry) async {
+    _fileEntries.add(entry);
+    notifyListeners();
+  }
+
+  List<FileEntry> getFilesForReptile(String reptileName) {
+    return _fileEntries
+        .where((entry) => entry.reptileName == reptileName)
+        .toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
+  }
+
+  // Delete methods
+  void deleteFeeding(FeedingEntry entry) {
+    _feedingEntries.remove(entry);
+    notifyListeners();
+  }
+
+  void deleteHistory(HistoryEntry entry) {
+    _historyEntries.remove(entry);
+    notifyListeners();
+  }
+
+  void deletePhoto(PhotoEntry entry) {
+    _photoEntries.remove(entry);
+    notifyListeners();
+  }
+
+  void deleteFile(FileEntry entry) {
+    _fileEntries.remove(entry);
     notifyListeners();
   }
 } 

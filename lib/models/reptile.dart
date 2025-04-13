@@ -12,6 +12,7 @@ class Reptile {
   final String? breeder;
   final String? remarks;
   final String species;
+  final String gender;
 
   Reptile({
     required this.name,
@@ -27,6 +28,7 @@ class Reptile {
     this.breeder,
     this.remarks,
     required this.species,
+    required this.gender,
   });
 
   Map<String, dynamic> toJson() => {
@@ -43,6 +45,7 @@ class Reptile {
     'breeder': breeder,
     'remarks': remarks,
     'species': species,
+    'gender': gender,
   };
 
   factory Reptile.fromJson(Map<String, dynamic> json) => Reptile(
@@ -51,13 +54,14 @@ class Reptile {
     group: json['group'],
     sex: json['sex'],
     morph: json['morph'],
-    length: json['length']?.toDouble(),
+    length: json['length']?.toDouble() ?? 0.0,
     lengthUnit: json['lengthUnit'] ?? 'cm',
-    weight: json['weight']?.toDouble(),
+    weight: json['weight']?.toDouble() ?? 0.0,
     weightUnit: json['weightUnit'] ?? 'gr',
     dateOfBirth: DateTime.parse(json['dateOfBirth']),
     breeder: json['breeder'],
     remarks: json['remarks'],
     species: json['species'],
+    gender: json['gender'],
   );
 } 
