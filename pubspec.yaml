@@ -1,17 +1,17 @@
 name: repfiles
-description: A reptile management application
+description: "A new Flutter project"
 publish_to: 'none'
 
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.6.0 <4.0.0'
+  sdk: '>=3.2.3 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  provider: ^6.1.1
   cupertino_icons: ^1.0.2
+  provider: ^6.1.1
 
 dev_dependencies:
   flutter_test:
@@ -19,4 +19,4 @@ dev_dependencies:
   flutter_lints: ^2.0.0
 
 flutter:
-  uses-material-design: true 
+  uses-material-design: true  # This gives us access to Material Icons 

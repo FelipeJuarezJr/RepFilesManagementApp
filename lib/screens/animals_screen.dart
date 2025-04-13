@@ -31,17 +31,37 @@ class AnimalsScreen extends StatelessWidget {
           }
 
           if (appState.reptiles.isEmpty) {
-            return const Center(
-              child: Text('No reptiles added yet. Tap + to add one!'),
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.pets,
+                    size: 100,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  const SizedBox(height: 24),
+                  const Text('No reptiles added yet. Tap + to add one!'),
+                ],
+              ),
             );
           }
 
-          return ListView.builder(
-            itemCount: appState.reptiles.length,
-            itemBuilder: (context, index) {
-              final reptile = appState.reptiles[index];
-              return ReptileListItem(reptile: reptile);
-            },
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: MediaQuery.of(context).size.width ~/ 400, // Responsive grid
+                childAspectRatio: 1.5, // More horizontal
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+              ),
+              itemCount: appState.reptiles.length,
+              itemBuilder: (context, index) {
+                final reptile = appState.reptiles[index];
+                return ReptileCard(reptile: reptile);
+              },
+            ),
           );
         },
       ),
@@ -56,10 +76,10 @@ class AnimalsScreen extends StatelessWidget {
   }
 }
 
-class ReptileListItem extends StatelessWidget {
+class ReptileCard extends StatelessWidget {
   final Reptile reptile;
 
-  const ReptileListItem({
+  const ReptileCard({
     super.key,
     required this.reptile,
   });
@@ -67,22 +87,170 @@ class ReptileListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Theme.of(context).primaryColor,
-          child: Text(
-            reptile.name[0].toUpperCase(),
-            style: const TextStyle(color: Colors.white),
+      elevation: 2,
+      child: Column(
+        children: [
+          // Hero Image and Info Section
+          Expanded(
+            child: Row(
+              children: [
+                // Left side - Image
+                Expanded(
+                  flex: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Icon(
+                      Icons.pets,
+                      size: 80,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                ),
+                // Right side - Info
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    reptile.name,
+                                    style: Theme.of(context).textTheme.titleLarge,
+                                  ),
+                                  if (reptile.identifier != null)
+                                    Text(
+                                      '(${reptile.identifier})',
+                                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                            color: Colors.grey,
+                                          ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            _buildGenderIcon(),
+                          ],
+                        ),
+                        const Spacer(),
+                        Row(
+                          children: [
+                            if (reptile.weight != null) ...[
+                              _buildInfoColumn(
+                                '${reptile.weight} ${reptile.weightUnit}',
+                                'Weight',
+                              ),
+                              const SizedBox(width: 24),
+                            ],
+                            _buildInfoColumn(
+                              _calculateAge(reptile.dateOfBirth),
+                              'Age',
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Footer Section
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  color: Colors.grey.shade300,
+                ),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                _buildActionButton(
+                  icon: Icons.timer,
+                  tooltip: 'Add tracking',
+                ),
+                _buildActionButton(
+                  icon: Icons.note_add,
+                  tooltip: 'Add note',
+                ),
+                _buildActionButton(
+                  icon: Icons.straighten,
+                  tooltip: 'Add measurement',
+                ),
+                _buildActionButton(
+                  icon: Icons.restaurant,
+                  tooltip: 'Feeding',
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: () {
+                    // TODO: Navigate to details
+                  },
+                  child: const Text('Details'),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGenderIcon() {
+    IconData icon;
+    Color color;
+    switch (reptile.sex.toLowerCase()) {
+      case 'male':
+        icon = Icons.male;
+        color = Colors.blue;
+        break;
+      case 'female':
+        icon = Icons.female;
+        color = Colors.pink;
+        break;
+      default:
+        icon = Icons.question_mark;
+        color = Colors.grey;
+    }
+    return Icon(icon, color: color, size: 24);
+  }
+
+  Widget _buildInfoColumn(String value, String label) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Text(
+          label.toUpperCase(),
+          style: const TextStyle(
+            color: Colors.grey,
+            fontSize: 12,
           ),
         ),
-        title: Text(reptile.name),
-        subtitle: Text('${reptile.species} • ${_calculateAge(reptile.dateOfBirth)}'),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: () {
-          // TODO: Navigate to reptile details
-        },
-      ),
+      ],
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String tooltip,
+  }) {
+    return IconButton(
+      icon: Icon(icon, size: 20),
+      tooltip: tooltip,
+      onPressed: () {
+        // TODO: Implement actions
+      },
     );
   }
 
@@ -407,14 +575,21 @@ class _AddReptileDialogState extends State<AddReptileDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
-        ElevatedButton(
-          onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              // TODO: Save reptile data
-              Navigator.pop(context);
-            }
+        Consumer<AppState>(
+          builder: (context, appState, child) {
+            return ElevatedButton(
+              onPressed: appState.isLoading ? null : _saveReptile,
+              child: appState.isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Text('Save'),
+            );
           },
-          child: const Text('Save'),
         ),
       ],
     );
@@ -501,6 +676,49 @@ class _AddReptileDialogState extends State<AddReptileDialog> {
       setState(() {
         _selectedMorphs = result;
       });
+    }
+  }
+
+  Future<void> _saveReptile() async {
+    if (_formKey.currentState!.validate()) {
+      if (_nameController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Name is required')),
+        );
+        return;
+      }
+
+      final reptile = Reptile(
+        name: _nameController.text,
+        identifier: _identifierController.text,
+        species: 'Ball Python', // TODO: Add species selection
+        dateOfBirth: _birthdate ?? DateTime.now(),
+        sex: _sex,
+        group: _group == 'No group selected' ? null : _group,
+        morph: _selectedMorphs.isNotEmpty ? _selectedMorphs.join(', ') : null,
+        length: double.tryParse(_lengthController.text),
+        lengthUnit: _lengthUnit,
+        weight: double.tryParse(_weightController.text),
+        weightUnit: _weightUnit,
+        breeder: _breederController.text,
+        remarks: _remarksController.text,
+      );
+
+      try {
+        await context.read<AppState>().addReptile(reptile);
+        if (mounted) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Reptile added successfully')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error adding reptile: $e')),
+          );
+        }
+      }
     }
   }
 

@@ -16,7 +16,7 @@ class AppState extends ChangeNotifier {
   int get totalAnimals => _totalAnimals;
   int get activeBreedingProjects => _activeBreedingProjects;
   int get todaysTasks => _todaysTasks;
-  List<Reptile> get reptiles => _reptiles;
+  List<Reptile> get reptiles => List.unmodifiable(_reptiles);
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -53,16 +53,19 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> addReptile(Reptile reptile) async {
-    _isLoading = true;
-    notifyListeners();
-
     try {
-      // TODO: Implement API call to add reptile
-      await Future.delayed(const Duration(seconds: 1));
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      // TODO: Add API call or database operation here
+      await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
+      
       _reptiles.add(reptile);
+      _isLoading = false;
+      notifyListeners();
     } catch (e) {
       _error = e.toString();
-    } finally {
       _isLoading = false;
       notifyListeners();
     }
@@ -77,6 +80,12 @@ class AppState extends ChangeNotifier {
   // Method to remove an animal
   void removeAnimal(dynamic animal) {
     _animals.remove(animal);
+    notifyListeners();
+  }
+
+  // Remove a reptile
+  void removeReptile(Reptile reptile) {
+    _reptiles.remove(reptile);
     notifyListeners();
   }
 } 
