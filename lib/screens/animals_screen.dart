@@ -5,6 +5,8 @@ import 'package:repfiles/models/reptile.dart';
 import '../styles/app_theme.dart';
 import '../models/morph.dart';
 import '../widgets/add_tracking_dialog.dart';
+import '../widgets/add_note_dialog.dart';
+import '../widgets/view_notes_dialog.dart';
 
 class AnimalsScreen extends StatelessWidget {
   const AnimalsScreen({super.key});
@@ -261,6 +263,16 @@ class ReptileCard extends StatelessWidget {
             builder: (context) => AddTrackingDialog(
               reptileName: reptile.name,
             ),
+          );
+        } else if (tooltip == 'Add note') {
+          // Check if notes exist first
+          final hasExistingNotes = context.read<AppState>().hasNotes(reptile.name);
+          
+          showDialog(
+            context: context,
+            builder: (context) => hasExistingNotes 
+              ? ViewNotesDialog(reptileName: reptile.name)
+              : AddNoteDialog(reptileName: reptile.name),
           );
         }
       },
