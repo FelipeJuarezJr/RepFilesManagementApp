@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'firebase_config.dart';
 
 // Create a .env file in the root of your project and add these values
 const String API_KEY = String.fromEnvironment('FIREBASE_API_KEY');
@@ -21,13 +22,13 @@ class DefaultFirebaseOptions {
     );
   }
 
-  static final FirebaseOptions web = FirebaseOptions(
-    apiKey: API_KEY,
-    authDomain: AUTH_DOMAIN,
-    projectId: PROJECT_ID,
-    storageBucket: STORAGE_BUCKET,
-    messagingSenderId: MESSAGING_SENDER_ID,
-    appId: APP_ID,
-    measurementId: MEASUREMENT_ID,
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: FirebaseConfig.apiKey,
+    authDomain: FirebaseConfig.authDomain,
+    projectId: FirebaseConfig.projectId,
+    storageBucket: FirebaseConfig.storageBucket,
+    messagingSenderId: FirebaseConfig.messagingSenderId,
+    appId: FirebaseConfig.appId,
+    measurementId: FirebaseConfig.measurementId,
   );
 } 
