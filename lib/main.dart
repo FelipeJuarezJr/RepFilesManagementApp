@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'services/auth_service.dart';
+import 'models/app_state.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/dashboard_screen.dart';
@@ -10,12 +14,19 @@ import 'screens/schedule_screen.dart';
 import 'screens/food_supply_screen.dart';
 import 'screens/settings_screen.dart';
 import 'styles/app_theme.dart';
-import 'models/app_state.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => AppState(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AppState()),
+        Provider<AuthService>(create: (_) => AuthService()),
+      ],
       child: const MyApp(),
     ),
   );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:repfiles/screens/dashboard_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'dashboard_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -8,7 +9,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('RepFiles'),
+        title: const Text('RepFiles Management'),
       ),
       drawer: NavigationDrawer(
         children: [

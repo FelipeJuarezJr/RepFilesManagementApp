@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'reptile.dart';
 import 'tracking_entry.dart';
 import 'note_entry.dart';
@@ -8,10 +9,11 @@ import 'photo_entry.dart';
 import 'file_entry.dart';
 
 class AppState extends ChangeNotifier {
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
   int _totalAnimals = 0;
   int _activeBreedingProjects = 0;
   int _todaysTasks = 0;
-  final List<Reptile> _reptiles = [];
+  List<Reptile> _reptiles = [];
   final List<TrackingEntry> _trackingEntries = [];
   final List<NoteEntry> _noteEntries = [];
   final List<FeedingEntry> _feedingEntries = [];
@@ -28,7 +30,7 @@ class AppState extends ChangeNotifier {
   int get totalAnimals => _totalAnimals;
   int get activeBreedingProjects => _activeBreedingProjects;
   int get todaysTasks => _todaysTasks;
-  List<Reptile> get reptiles => List.unmodifiable(_reptiles);
+  List<Reptile> get reptiles => _reptiles;
   List<TrackingEntry> get trackingEntries => List.unmodifiable(_trackingEntries);
   List<NoteEntry> get noteEntries => List.unmodifiable(_noteEntries);
   List<FeedingEntry> get feedingEntries => List.unmodifiable(_feedingEntries);
@@ -59,11 +61,12 @@ class AppState extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // TODO: Implement API call to load reptiles
-      await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
-      _reptiles.clear(); // Replace with actual data
+      final snapshot = await _db.collection('reptiles').get();
+      _reptiles = snapshot.docs
+          .map((doc) => Reptile.fromMap(doc.data(), doc.id))
+          .toList();
     } catch (e) {
-      _error = e.toString();
+      _error = 'Failed to load reptiles: $e';
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -71,18 +74,16 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> addReptile(Reptile reptile) async {
-    try {
-      _isLoading = true;
-      _error = null;
-      notifyListeners();
+    _isLoading = true;
+    notifyListeners();
 
-      await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
-      
-      _reptiles.add(reptile);
-      _isLoading = false;
-      notifyListeners();
+    try {
+      final docRef = await _db.collection('reptiles').add(reptile.toMap());
+      final newReptile = reptile.copyWith(id: docRef.id);
+      _reptiles.add(newReptile);
     } catch (e) {
-      _error = e.toString();
+      _error = 'Failed to add reptile: $e';
+    } finally {
       _isLoading = false;
       notifyListeners();
     }
@@ -132,7 +133,9 @@ class AppState extends ChangeNotifier {
   }
 
   bool hasNotes(String reptileName) {
-    return _noteEntries.any((note) => note.reptileName == reptileName);
+    return _reptiles.any((reptile) => 
+      reptile.name == reptileName && reptile.notes.isNotEmpty
+    );
   }
 
   List<NoteEntry> getNotesForReptile(String reptileName) {

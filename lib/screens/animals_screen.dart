@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:repfiles/models/app_state.dart';
-import 'package:repfiles/models/reptile.dart';
+import '../models/app_state.dart';
+import '../models/reptile.dart';
 import '../styles/app_theme.dart';
 import '../models/morph.dart';
 import '../widgets/add_tracking_dialog.dart';
@@ -222,7 +222,7 @@ class ReptileCard extends StatelessWidget {
   Widget _buildGenderIcon() {
     IconData icon;
     Color color;
-    switch (reptile.sex.toLowerCase()) {
+    switch (reptile.gender.toLowerCase()) {
       case 'male':
         icon = Icons.male;
         color = Colors.blue;
@@ -722,20 +722,18 @@ class _AddReptileDialogState extends State<AddReptileDialog> {
       }
 
       final reptile = Reptile(
+        id: DateTime.now().toString(), // temporary ID
         name: _nameController.text,
         identifier: _identifierController.text,
         species: 'Ball Python', // TODO: Add species selection
         dateOfBirth: _birthdate ?? DateTime.now(),
-        sex: _sex,
-        group: _group == 'No group selected' ? null : _group,
-        morph: _selectedMorphs.isNotEmpty ? _selectedMorphs.join(', ') : null,
+        dateAcquired: DateTime.now(),
+        gender: _sex, // Changed from sex to gender
+        morph: _selectedMorphs.isNotEmpty ? _selectedMorphs.join(', ') : '',
         length: double.tryParse(_lengthController.text) ?? 0,
         lengthUnit: _lengthUnit,
         weight: double.tryParse(_weightController.text) ?? 0,
         weightUnit: _weightUnit,
-        breeder: _breederController.text,
-        remarks: _remarksController.text,
-        gender: 'unknown',
       );
 
       try {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:repfiles/models/app_state.dart';
-import 'package:repfiles/models/reptile.dart';
-import 'package:repfiles/widgets/select_reptile_dialog.dart';
+import '../models/app_state.dart';
+import '../models/reptile.dart';
+import '../widgets/select_reptile_dialog.dart';
 
 class BreedingScreen extends StatelessWidget {
   const BreedingScreen({super.key});
